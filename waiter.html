@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Waiter Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header><h1>📋 Waiter Dashboard</h1></header>
+  <div id="orders" style="padding:20px;"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const ordersDiv = document.getElementById("orders");
+
+    // load past orders from DB
+    fetch("/api/orders")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(order => addOrder(order));
+      });
+
+    // live orders
+    socket.on("newOrder", (order) => {
+      addOrder(order);
+    });
+
+    function addOrder(order) {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `<div class="card-content">
+        <h3>🍽 ${order.item}</h3>
+        <p>🕒 ${order.time}</p>
+      </div>`;
+      ordersDiv.prepend(div);
+    }
+  </script>
+</body>
+</html>
